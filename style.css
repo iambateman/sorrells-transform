@@ -1,0 +1,16 @@
+
+canvas {
+      display: block;
+      background-color: #ffffff;
+      margin: 20px auto;
+      }
+body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #ffff;
+    }
+    #container {
+      width: 50px;
+      height: 50px;
+    }
