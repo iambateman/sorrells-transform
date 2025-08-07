@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<!-- saved from url=(0034)https://steven.codes/oscilloscope/ -->
+<html style="--eq-body-width: 1368;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Three.js powered</title>
+		<style>
+			body { margin: 0; padding: 0; overflow-y: hidden; }
+			canvas { width: 100%; height: 100%; cursor: move; }
+			.div-theme {
+				font-family: 'Lucida Grande', 'Helvetica', sans-serif;
+				color: #eee;
+				background: black;
+			}
+
+			#info {
+				width: 180px; height: 140px;
+				position: fixed; right: 8px; bottom: 8px;
+			}
+			hr {
+				margin: 0;
+				border: none; border-top: 1px solid #555555;
+			}
+			#more-link {
+				text-decoration: underline;
+				cursor: pointer;
+			}
+
+			#more-info-overlay {
+				background:rgba(0, 0, 0, 0.5);
+				position: fixed;
+				top: 0; right: 0; bottom: 0; left: 0;
+				z-index: 1;
+
+				display: none;
+			}
+			#more-info {
+				width: 400px;
+				max-width: calc(100% - 24px);
+				position: relative;
+				margin: 0 auto;
+				top: 50%;
+				transform: translateY(-50%);
+				border: 1px solid #555555;
+			}
+			#more-info div, #info div {
+				margin: 0;
+				padding: 8px 12px;
+				font-size: 14px;
+			}
+			#no-web-gl-overlay {
+				display: none;
+				position: absolute;
+				height: 100%;
+				width: 100%;
+				background: black;
+			}
+			#no-web-gl-overlay > div {
+				position: relative;
+				width: 300px;
+				max-width: calc(100% - 20px);
+				padding: 10px;
+				margin: 0 auto;
+				top: 50%;
+				transform: translateY(-50%);
+				color: white;
+			}
+		</style>
+	<style type="text/css">.dg ul{list-style:none;margin:0;padding:0;width:100%;clear:both}.dg.ac{position:fixed;top:0;left:0;right:0;height:0;z-index:0}.dg:not(.ac) .main{overflow:hidden}.dg.main{-webkit-transition:opacity .1s linear;-o-transition:opacity .1s linear;-moz-transition:opacity .1s linear;transition:opacity .1s linear}.dg.main.taller-than-window{overflow-y:auto}.dg.main.taller-than-window .close-button{opacity:1;margin-top:-1px;border-top:1px solid #2c2c2c}.dg.main ul.closed .close-button{opacity:1 !important}.dg.main:hover .close-button,.dg.main .close-button.drag{opacity:1}.dg.main .close-button{-webkit-transition:opacity .1s linear;-o-transition:opacity .1s linear;-moz-transition:opacity .1s linear;transition:opacity .1s linear;border:0;line-height:19px;height:20px;cursor:pointer;text-align:center;background-color:#000}.dg.main .close-button.close-top{position:relative}.dg.main .close-button.close-bottom{position:absolute}.dg.main .close-button:hover{background-color:#111}.dg.a{float:right;margin-right:15px;overflow-y:visible}.dg.a.has-save>ul.close-top{margin-top:0}.dg.a.has-save>ul.close-bottom{margin-top:27px}.dg.a.has-save>ul.closed{margin-top:0}.dg.a .save-row{top:0;z-index:1002}.dg.a .save-row.close-top{position:relative}.dg.a .save-row.close-bottom{position:fixed}.dg li{-webkit-transition:height .1s ease-out;-o-transition:height .1s ease-out;-moz-transition:height .1s ease-out;transition:height .1s ease-out;-webkit-transition:overflow .1s linear;-o-transition:overflow .1s linear;-moz-transition:overflow .1s linear;transition:overflow .1s linear}.dg li:not(.folder){cursor:auto;height:27px;line-height:27px;padding:0 4px 0 5px}.dg li.folder{padding:0;border-left:4px solid transparent}.dg li.title{cursor:pointer;margin-left:-4px}.dg .closed li:not(.title),.dg .closed ul li,.dg .closed ul li>*{height:0;overflow:hidden;border:0}.dg .cr{clear:both;padding-left:3px;height:27px;overflow:hidden}.dg .property-name{cursor:default;float:left;clear:left;width:40%;overflow:hidden;text-overflow:ellipsis}.dg .c{float:left;width:60%;position:relative}.dg .c input[type=text]{border:0;margin-top:4px;padding:3px;width:100%;float:right}.dg .has-slider input[type=text]{width:30%;margin-left:0}.dg .slider{float:left;width:66%;margin-left:-5px;margin-right:0;height:19px;margin-top:4px}.dg .slider-fg{height:100%}.dg .c input[type=checkbox]{margin-top:7px}.dg .c select{margin-top:5px}.dg .cr.function,.dg .cr.function .property-name,.dg .cr.function *,.dg .cr.boolean,.dg .cr.boolean *{cursor:pointer}.dg .cr.color{overflow:visible}.dg .selector{display:none;position:absolute;margin-left:-9px;margin-top:23px;z-index:10}.dg .c:hover .selector,.dg .selector.drag{display:block}.dg li.save-row{padding:0}.dg li.save-row .button{display:inline-block;padding:0px 6px}.dg.dialogue{background-color:#222;width:460px;padding:15px;font-size:13px;line-height:15px}#dg-new-constructor{padding:10px;color:#222;font-family:Monaco, monospace;font-size:10px;border:0;resize:none;box-shadow:inset 1px 1px 1px #888;word-wrap:break-word;margin:12px 0;display:block;width:440px;overflow-y:scroll;height:100px;position:relative}#dg-local-explain{display:none;font-size:11px;line-height:17px;border-radius:3px;background-color:#333;padding:8px;margin-top:10px}#dg-local-explain code{font-size:10px}#dat-gui-save-locally{display:none}.dg{color:#eee;font:11px 'Lucida Grande', sans-serif;text-shadow:0 -1px 0 #111}.dg.main::-webkit-scrollbar{width:5px;background:#1a1a1a}.dg.main::-webkit-scrollbar-corner{height:0;display:none}.dg.main::-webkit-scrollbar-thumb{border-radius:5px;background:#676767}.dg li:not(.folder){background:#1a1a1a;border-bottom:1px solid #2c2c2c}.dg li.save-row{line-height:25px;background:#dad5cb;border:0}.dg li.save-row select{margin-left:5px;width:108px}.dg li.save-row .button{margin-left:5px;margin-top:1px;border-radius:2px;font-size:9px;line-height:7px;padding:4px 4px 5px 4px;background:#c5bdad;color:#fff;text-shadow:0 1px 0 #b0a58f;box-shadow:0 -1px 0 #b0a58f;cursor:pointer}.dg li.save-row .button.gears{background:#c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;height:7px;width:8px}.dg li.save-row .button:hover{background-color:#bab19e;box-shadow:0 -1px 0 #b0a58f}.dg li.folder{border-bottom:0}.dg li.title{padding-left:16px;background:#000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.2)}.dg .closed li.title{background-image:url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==)}.dg .cr.boolean{border-left:3px solid #806787}.dg .cr.color{border-left:3px solid}.dg .cr.function{border-left:3px solid #e61d5f}.dg .cr.number{border-left:3px solid #2FA1D6}.dg .cr.number input[type=text]{color:#2FA1D6}.dg .cr.string{border-left:3px solid #1ed36f}.dg .cr.string input[type=text]{color:#1ed36f}.dg .cr.function:hover,.dg .cr.boolean:hover{background:#111}.dg .c input[type=text]{background:#303030;outline:none}.dg .c input[type=text]:hover{background:#3c3c3c}.dg .c input[type=text]:focus{background:#494949;color:#fff}.dg .c .slider{background:#303030;cursor:ew-resize}.dg .c .slider-fg{background:#2FA1D6;max-width:100%}.dg .c .slider:hover{background:#3c3c3c}.dg .c .slider:hover .slider-fg{background:#44abda}
+</style><style type="text/css">.dg ul{list-style:none;margin:0;padding:0;width:100%;clear:both}.dg.ac{position:fixed;top:0;left:0;right:0;height:0;z-index:0}.dg:not(.ac) .main{overflow:hidden}.dg.main{-webkit-transition:opacity .1s linear;-o-transition:opacity .1s linear;-moz-transition:opacity .1s linear;transition:opacity .1s linear}.dg.main.taller-than-window{overflow-y:auto}.dg.main.taller-than-window .close-button{opacity:1;margin-top:-1px;border-top:1px solid #2c2c2c}.dg.main ul.closed .close-button{opacity:1 !important}.dg.main:hover .close-button,.dg.main .close-button.drag{opacity:1}.dg.main .close-button{-webkit-transition:opacity .1s linear;-o-transition:opacity .1s linear;-moz-transition:opacity .1s linear;transition:opacity .1s linear;border:0;line-height:19px;height:20px;cursor:pointer;text-align:center;background-color:#000}.dg.main .close-button.close-top{position:relative}.dg.main .close-button.close-bottom{position:absolute}.dg.main .close-button:hover{background-color:#111}.dg.a{float:right;margin-right:15px;overflow-y:visible}.dg.a.has-save>ul.close-top{margin-top:0}.dg.a.has-save>ul.close-bottom{margin-top:27px}.dg.a.has-save>ul.closed{margin-top:0}.dg.a .save-row{top:0;z-index:1002}.dg.a .save-row.close-top{position:relative}.dg.a .save-row.close-bottom{position:fixed}.dg li{-webkit-transition:height .1s ease-out;-o-transition:height .1s ease-out;-moz-transition:height .1s ease-out;transition:height .1s ease-out;-webkit-transition:overflow .1s linear;-o-transition:overflow .1s linear;-moz-transition:overflow .1s linear;transition:overflow .1s linear}.dg li:not(.folder){cursor:auto;height:27px;line-height:27px;padding:0 4px 0 5px}.dg li.folder{padding:0;border-left:4px solid transparent}.dg li.title{cursor:pointer;margin-left:-4px}.dg .closed li:not(.title),.dg .closed ul li,.dg .closed ul li>*{height:0;overflow:hidden;border:0}.dg .cr{clear:both;padding-left:3px;height:27px;overflow:hidden}.dg .property-name{cursor:default;float:left;clear:left;width:40%;overflow:hidden;text-overflow:ellipsis}.dg .c{float:left;width:60%;position:relative}.dg .c input[type=text]{border:0;margin-top:4px;padding:3px;width:100%;float:right}.dg .has-slider input[type=text]{width:30%;margin-left:0}.dg .slider{float:left;width:66%;margin-left:-5px;margin-right:0;height:19px;margin-top:4px}.dg .slider-fg{height:100%}.dg .c input[type=checkbox]{margin-top:7px}.dg .c select{margin-top:5px}.dg .cr.function,.dg .cr.function .property-name,.dg .cr.function *,.dg .cr.boolean,.dg .cr.boolean *{cursor:pointer}.dg .cr.color{overflow:visible}.dg .selector{display:none;position:absolute;margin-left:-9px;margin-top:23px;z-index:10}.dg .c:hover .selector,.dg .selector.drag{display:block}.dg li.save-row{padding:0}.dg li.save-row .button{display:inline-block;padding:0px 6px}.dg.dialogue{background-color:#222;width:460px;padding:15px;font-size:13px;line-height:15px}#dg-new-constructor{padding:10px;color:#222;font-family:Monaco, monospace;font-size:10px;border:0;resize:none;box-shadow:inset 1px 1px 1px #888;word-wrap:break-word;margin:12px 0;display:block;width:440px;overflow-y:scroll;height:100px;position:relative}#dg-local-explain{display:none;font-size:11px;line-height:17px;border-radius:3px;background-color:#333;padding:8px;margin-top:10px}#dg-local-explain code{font-size:10px}#dat-gui-save-locally{display:none}.dg{color:#eee;font:11px 'Lucida Grande', sans-serif;text-shadow:0 -1px 0 #111}.dg.main::-webkit-scrollbar{width:5px;background:#1a1a1a}.dg.main::-webkit-scrollbar-corner{height:0;display:none}.dg.main::-webkit-scrollbar-thumb{border-radius:5px;background:#676767}.dg li:not(.folder){background:#1a1a1a;border-bottom:1px solid #2c2c2c}.dg li.save-row{line-height:25px;background:#dad5cb;border:0}.dg li.save-row select{margin-left:5px;width:108px}.dg li.save-row .button{margin-left:5px;margin-top:1px;border-radius:2px;font-size:9px;line-height:7px;padding:4px 4px 5px 4px;background:#c5bdad;color:#fff;text-shadow:0 1px 0 #b0a58f;box-shadow:0 -1px 0 #b0a58f;cursor:pointer}.dg li.save-row .button.gears{background:#c5bdad url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg==) 2px 1px no-repeat;height:7px;width:8px}.dg li.save-row .button:hover{background-color:#bab19e;box-shadow:0 -1px 0 #b0a58f}.dg li.folder{border-bottom:0}.dg li.title{padding-left:16px;background:#000 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.2)}.dg .closed li.title{background-image:url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==)}.dg .cr.boolean{border-left:3px solid #806787}.dg .cr.color{border-left:3px solid}.dg .cr.function{border-left:3px solid #e61d5f}.dg .cr.number{border-left:3px solid #2FA1D6}.dg .cr.number input[type=text]{color:#2FA1D6}.dg .cr.string{border-left:3px solid #1ed36f}.dg .cr.string input[type=text]{color:#1ed36f}.dg .cr.function:hover,.dg .cr.boolean:hover{background:#111}.dg .c input[type=text]{background:#303030;outline:none}.dg .c input[type=text]:hover{background:#3c3c3c}.dg .c input[type=text]:focus{background:#494949;color:#fff}.dg .c .slider{background:#303030;cursor:ew-resize}.dg .c .slider-fg{background:#2FA1D6;max-width:100%}.dg .c .slider:hover{background:#3c3c3c}.dg .c .slider:hover .slider-fg{background:#44abda}
+</style></head>
+	<body class="eqlCkr_side_left">
+		<div id="info" class="div-theme">
+			<div>
+				Oscilloscope
+			</div>
+			<hr>
+			<div>
+				Try setting the frequencies to various fractions of each other. Then, add small variations.
+				<span id="more-link">more...</span>
+			</div>
+		</div>
+		<div id="no-web-gl-overlay">
+			<div class="div-theme">
+				<p>
+					Sorry, this page does some special computation that your browser can't do.
+				</p>
+				<p>
+					Try visiting this page on a desktop computer.
+				</p>
+			</div>
+		</div>
+		<div id="more-info-overlay" style="display: none;">
+			<div id="more-info" class="div-theme">
+				<div>
+					Oscilloscope
+				</div>
+				<hr>
+				<div>
+					Try setting the frequencies to various fractions of each other. Then, add small variations.
+					<br><br>
+					An oscilloscope is a type of electronic test instrument
+					that allows observation of varying signal voltages,
+					usually as a two-dimensional plot of one or more signals
+					as a function of time [wikipedia].
+					<br><br>
+					This web experiment displays the combination of <em>three</em>
+					signals. Specifically, three sine waves, each with only
+					an x, y, and z component respectively. The resulting
+					patterns you see are called Lissajous curves.
+					<br><br>
+					There are technical challenges that are hard to surmount
+					when building something that displays frequency-based
+					images. For example, the framerate of this browser acts
+					as an unwanted fourth signal that affects the curve.
+				</div>
+			</div>
+		</div>
+		<script src="./Three.js powered_files/Tween.js"></script>
+		<script src="./Three.js powered_files/three.js"></script>
+		<script src="./Three.js powered_files/OrbitControls.js"></script>
+		<script src="./Three.js powered_files/dat.gui.min.js"></script>
+		<script src="./Three.js powered_files/Tone.min.js"></script>
+		<script id="vertexshader" type="x-shader/x-vertex">
+
+					attribute vec3 customColor;
+
+					varying vec3 vColor;
+
+					void main() {
+
+						vColor = customColor;
+
+						gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+					}
+
+		</script>
+		<script id="fragmentshader" type="x-shader/x-fragment">
+
+					uniform float opacity;
+
+					varying vec3 vColor;
+
+					void main() {
+
+						gl_FragColor = vec4( vColor, opacity );
+
+					}
+
+		</script>
+		<script src="./Three.js powered_files/main.js"></script><canvas width="1728" height="958" style="width: 1728px; height: 958px;"></canvas><div style="cursor: pointer; width: 80px; opacity: 0.9; z-index: 10001; position: absolute; top: 0px;"><div style="text-align: left; line-height: 1.2em; background-color: rgb(8, 8, 24); padding: 0px 0px 3px 3px;"><div style="font-family: Helvetica, Arial, sans-serif; font-size: 9px; color: rgb(0, 255, 255); font-weight: bold;">122 FPS (106-123)</div><div style="position: relative; width: 74px; height: 30px; background-color: rgb(0, 255, 255);"><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 16, 48);"></span></div></div><div style="text-align: left; line-height: 1.2em; background-color: rgb(8, 24, 8); padding: 0px 0px 3px 3px; display: none;"><div style="font-family: Helvetica, Arial, sans-serif; font-size: 9px; color: rgb(0, 255, 0); font-weight: bold;">8 MS (0-98)</div><div style="position: relative; width: 74px; height: 30px; background-color: rgb(0, 255, 0);"><span style="width: 1px; height: 29.25px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.5px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.5px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.35px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 29.1px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.35px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 29.1px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.35px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 27.9px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 29.1px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 30px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 29.25px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 29.1px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.5px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.5px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.5px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.65px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.2px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.95px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 29.1px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.5px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span><span style="width: 1px; height: 28.8px; float: left; background-color: rgb(16, 48, 16);"></span></div></div></div><div class="dg ac"><div class="dg main a" style="width: 245px;"><div style="width: 6px; margin-left: -3px; height: 0px; cursor: ew-resize; position: absolute;"></div><ul style="height: auto;" class="closed"><li class="cr number has-slider"><div><span class="property-name">x Hz</span><div class="c"><div><input type="text"></div><div class="slider"><div class="slider-fg" style="width: 19.3333%;"></div></div></div></div></li><li class="cr number has-slider"><div><span class="property-name">y Hz</span><div class="c"><div><input type="text"></div><div class="slider"><div class="slider-fg" style="width: 19.3333%;"></div></div></div></div></li><li class="cr number has-slider"><div><span class="property-name">z Hz</span><div class="c"><div><input type="text"></div><div class="slider"><div class="slider-fg" style="width: 12.8333%;"></div></div></div></div></li><li class="cr number has-slider"><div><span class="property-name">Blur</span><div class="c"><div><input type="text"></div><div class="slider"><div class="slider-fg" style="width: 33.3333%;"></div></div></div></div></li><li class="cr boolean"><div><span class="property-name">Mute</span><div class="c"><input type="checkbox" checked="checked"></div></div></li><li class="cr function"><div><span class="property-name">Switch to 2D</span><div class="c"><div class="button"></div></div></div></li><li class="folder"><div class="dg"><ul><li class="title">Examples</li><li class="cr function"><div><span class="property-name">example 1</span><div class="c"><div class="button"></div></div></div></li><li class="cr function"><div><span class="property-name">example 2</span><div class="c"><div class="button"></div></div></div></li><li class="cr function"><div><span class="property-name">example 3</span><div class="c"><div class="button"></div></div></div></li><li class="cr function"><div><span class="property-name">example 4</span><div class="c"><div class="button"></div></div></div></li></ul></div></li></ul><div class="close-button close-bottom" style="width: 245px;">Open Controls</div></div></div>
+		<script>
+			document.getElementById("more-link").addEventListener("click", function() {
+				document.getElementById("more-info-overlay").style.display = "block";
+			});
+			document.getElementById("more-info-overlay").addEventListener("click", function() {
+				document.getElementById("more-info-overlay").style.display = "none";
+			});
+		</script>
+	
+<div id="screenity-ui"><div class="screenity-shadow-dom"><div><div></div><div></div></div><style type="text/css">
+			#screenity-ui, #screenity-ui div {
+				background-color: unset;
+				padding: unset;
+				width: unset;
+				box-shadow: unset;
+				display: unset;
+				margin: unset;
+				border-radius: unset;
+			}
+			.screenity-outline {
+				position: absolute;
+				z-index: 99999999999;
+				border: 2px solid #3080F8;
+				outline-offset: -2px;
+				pointer-events: none;
+				border-radius: 5px!important;
+			}
+		.screenity-blur {
+			filter: blur(10px)!important;
+		}
+			.screenity-shadow-dom * {
+				transition: unset;
+			}
+			.screenity-shadow-dom .TooltipContent {
+  border-radius: 30px!important;
+	background-color: #29292F!important;
+  padding: 10px 15px!important;
+  font-size: 12px;
+	margin-bottom: 10px!important;
+	bottom: 100px;
+  line-height: 1;
+	font-family: 'Satoshi-Medium', sans-serif;
+	z-index: 99999999!important;
+  color: #FFF;
+  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px!important;
+  user-select: none;
+	transition: opacity 0.3 ease-in-out;
+  will-change: transform, opacity;
+	animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.screenity-shadow-dom .hide-tooltip {
+	display: none!important;
+}
+
+.screenity-shadow-dom .tooltip-tall {
+	margin-bottom: 20px;
+}
+
+.screenity-shadow-dom .tooltip-small {
+	margin-bottom: 5px;
+}
+
+.screenity-shadow-dom .TooltipContent[data-state='delayed-open'][data-side='top'] {
+	animation-name: slideDownAndFade;
+}
+.screenity-shadow-dom .TooltipContent[data-state='delayed-open'][data-side='right'] {
+  animation-name: slideLeftAndFade;
+}
+.screenity-shadow-dom.TooltipContent[data-state='delayed-open'][data-side='bottom'] {
+  animation-name: slideUpAndFade;
+}
+.screenity-shadow-dom.TooltipContent[data-state='delayed-open'][data-side='left'] {
+  animation-name: slideRightAndFade;
+}
+
+@keyframes slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRightAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDownAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeftAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+#screenity-ui [data-radix-popper-content-wrapper] { z-index: 999999999999!important; } 
+
+.screenity-shadow-dom .CanvasContainer {
+	position: fixed;
+	pointer-events: all!important;
+	top: 0px!important;
+	left: 0px!important;
+	z-index: 99999999999!important;
+}
+.screenity-shadow-dom .canvas {
+	position: fixed;
+	top: 0px!important;
+	left: 0px!important;
+	z-index: 99999999999!important;
+	background: transparent!important;
+}
+.screenity-shadow-dom .canvas-container {
+	top: 0px!important;
+	left: 0px!important;
+	z-index: 99999999999;
+	position: fixed!important;
+	background: transparent!important;
+}
+
+.ScreenityDropdownMenuContent {
+	z-index: 99999999999!important;
+  min-width: 200px;
+  background-color: white;
+  margin-top: 4px;
+  margin-right: 8px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-radius: 15px;
+  z-index: 99999;
+  font-family: 'Satoshi-Medium', sans-serif;
+  color: #29292F;
+  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
+    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+.ScreenityDropdownMenuContent[data-side="top"] {
+  animation-name: slideDownAndFade;
+}
+.ScreenityDropdownMenuContent[data-side="right"] {
+  animation-name: slideLeftAndFade;
+}
+.ScreenityDropdownMenuContent[data-side="bottom"] {
+  animation-name: slideUpAndFade;
+}
+.ScreenityDropdownMenuContent[data-side="left"] {
+  animation-name: slideRightAndFade;
+}
+.ScreenityItemIndicator {
+  position: absolute;
+  right: 12px; 
+  width: 18px;
+  height: 18px;
+  background: #3080F8;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ScreenityDropdownMenuItem,
+.ScreenityDropdownMenuRadioItem {
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 5px;
+  position: relative;
+  padding-left: 22px;
+  padding-right: 22px;
+  user-select: none;
+  outline: none;
+}
+.ScreenityDropdownMenuItem:hover {
+    background-color: #F6F7FB !important;
+    cursor: pointer;
+}
+.ScreenityDropdownMenuItem[data-disabled] {
+  color: #6E7684; !important;
+  cursor: not-allowed;
+  background-color: #F6F7FB !important;
+}
+
+
+
+@keyframes slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRightAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDownAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeftAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+</style></div></div></body></html>
